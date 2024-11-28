@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="/stylesheets/style_login_sign_Rest.css">
+<html>
+
+<head>
+    <title>Login</title>
+</head>
+z
+<body>
+    
+    <div class="main">
+        <h1>Class management system</h1>
+        <h3>Login </h3>
+
+        <form action="/logining" method="post"id="loginForm">
+            <label for="Username">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter your Password" required>
+
+            <button type="submit">Submit</button>
+            
+        </form>
+        <p class="error" id="errorMsg"></p>
+
+        <div class="wrap">
+        	<a href="/signup">Create a account</a>
+        </div>
+        
+        <p>Forgot your password?
+            <a href="/reset">Reset password</a>
+        </p>
+    </div>
+</body>
+</html>

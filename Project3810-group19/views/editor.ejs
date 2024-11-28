@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Students</title>
+    <link rel="stylesheet" href="/stylesheets/editor.css"> 
+    <style>
+        /* Modal Style */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4); /* Transparent black */
+            overflow: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 500px;
+        }
+        
+        /* Close Button */
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            float: right;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: black;
+            cursor: pointer;
+        }
+        
+        /* Form Styling */
+        input[type="text"], input[type="number"], button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <script>
+        let isEditing = false;
+
+        function toggleEditAll() {
+            const inputs = document.querySelectorAll('input[type="text"]');
+            inputs.forEach(input => {
+                input.disabled = !input.disabled;
+            });
+
+            document.getElementById('saveAllButton').style.display = 'block';
+            document.getElementById('cancelAllButton').style.display = 'block';
+            document.getElementById('editAllButton').style.display = 'none';
+            
+            document.getElementById('addBtn').style.display = 'block';
+        }
+        
+        function cancelEditAll() {
+            const inputs = document.querySelectorAll('input[type="text"]');
+            inputs.forEach(input => {
+                input.disabled = true;
+            });
+
+            document.getElementById('editAllButton').style.display = 'block';
+            document.getElementById('saveAllButton').style.display = 'none';
+            document.getElementById('cancelAllButton').style.display = 'none';
+
+            document.getElementById('addBtn').style.display = 'none';
+        }
+
+        function showAddModal() {
+            const modal = document.getElementById('addModal');
+            modal.style.display = 'block';
+            
+            const modalInputs = document.querySelectorAll('#addModal input');
+            modalInputs.forEach(input => {
+                input.disabled = false;
+            });
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').style.display = 'none';
+        }
+
+        document.getElementById('addStudentForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            
+            const newStudent = {
+                ClassID: document.getElementById('ClassID').value,
+                SID: document.getElementById('SID').value,
+                'First name': document.getElementById('First name').value,
+                'Last name': document.getElementById('Last name').value,
+                Gender: document.getElementById('Gender').value,
+                age: document.getElementById('age').value,
+                'Home address': document.getElementById('Home address').value,
+                'phone address': document.getElementById('phone address').value,
+                Credit: document.getElementById('Credit').value
+            };
+
+            fetch('/edit/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newStudent)
+            })
+            .then(response => response.json()) 
+            .then(data => {
+                if (data.success) {
+                    alert('Student added successfully');
+                    window.location.reload(); 
+                } else {
+                    alert('Error adding student: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error('Error adding student:', err);
+                alert('Error adding student');
+            });
+
+            closeAddModal();
+        });
+        
+        function deleteStudent(studentId) {
+            fetch(`/edit/delete/${studentId}`, {
+                method: 'DELETE'
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = '/edit'; 
+                } else {
+                    alert('Failed to delete student');
+                }
+            }).catch(error => console.error('Error:', error));
+        }
+        
+        function confirmDelete(studentId, SID) {
+            const confirmation = confirm(`Are you sure you want to delete the student with SID: ${SID}?`);
+    
+            if (confirmation) {
+                document.getElementById('deleteForm-' + studentId).submit();
+            }
+        }     
+
+    </script>
+</head>
+<body>
+    <ul class = "wrapper">
+        <h1>Student Information</h1>     
+        </class>
+    </ul>
+    <div class="wrapper">
+        <input type="text" placeholder="Search..">
+    </div>
+    <form action="/edit/saveAll" method="POST">
+        <table>
+            <thead>
+                <tr>
+                    <th>SID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Gender</th>
+                    <th>Age</th>
+                    <th>Home Address</th>
+                    <th>Phone Address</th>
+                    <th>Credit</th>
+                    <th>ClassID</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% students.forEach(student => { %>
+                    <tr>
+                        <td><input type="text" name="students[<%= student._id %>][SID]" value="<%= student.SID %>" disabled></td>
+                        <td><input type="text" name="students[<%= student._id %>][First name]" value="<%= student['First name'] %>" disabled></td>
+                        <td><input type="text" name="students[<%= student._id %>][Last name]" value="<%= student['Last name'] %>" disabled></td>
+                        <td><input type="text" name="students[<%= student._id %>][Gender]" value="<%= student.Gender %>" disabled></td>
+                        <td><input type="text" name="students[<%= student._id %>][age]" value="<%= student.age %>" disabled></td>
+                        <td><input type="text" name="students[<%= student._id %>][Home address]" value="<%= student['Home address'] %>" disabled></td>
+                        <td><input type="text" name="students[<%= student._id %>][phone address]" value="<%= student['phone address'] %>" disabled></td>
+                        <td><input type="text" name="students[<%= student._id %>][Credit]" value="<%= student.Credit %>" disabled></td>
+                        <td><input type="text" name="students[<%= student._id %>][ClassID]" value="<%= student.ClassID %>" disabled></td>
+                        <td>
+                            <form action="/edit/delete/<%= student._id %>?_method=DELETE" method="POST" style="display: inline;" id="deleteForm-<%= student._id %>">
+                                <button type="button" onclick="confirmDelete('<%= student._id %>', '<%= student.SID %>')" style="display: inline;">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    
+        <button type="button" id="editAllButton" onclick="toggleEditAll()">Edit</button>
+        <button type="button" id="addBtn" style="display: none;" onclick="showAddModal()">Add Student</button>
+        <button type="submit" id="saveAllButton" style="display: none;">Save All</button>
+        <button type="button" id="cancelAllButton" style="display: none;" onclick="cancelEditAll()">Cancel</button>
+        <button type = "button" onclick="window.location.href='/home';">Back</button>
+    </form>
+
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddModal()">&times;</span>
+            <h2>Add New Student</h2>
+            <form id="addStudentForm" method="post" action="/edit/add">
+                <label for="ClassID">ClassID:</label><input type="text" id="ClassID" name="ClassID" required><br>
+                <label for="SID">SID:</label><input type="text" id="SID" name="SID" required><br>
+                <label for="First name">First Name:</label><input type="text" id="First name" name="First name" required><br>
+                <label for="Last name">Last Name:</label><input type="text" id="Last name" name="Last name" required><br>
+                <label for="Gender">Gender:</label><input type="text" id="Gender" name="Gender" required><br>
+                <label for="age">Age:</label><input type="number" id="age" name="age" required><br>
+                <label for="Home address">Home Address:</label><input type="text" id="Home address" name="Home address" required><br>
+                <label for="phone address">Phone Address:</label><input type="text" id="phone address" name="phone address" required><br>
+                <label for="Credit">Credit:</label><input type="text" id="Credit" name="Credit" required><br>
+                <button type="submit">Add Student</button>
+            </form>
+        </div>
+    </div>
+    <ul class="nav-area">
+        <li><a href="/logout" class="btn btn-danger">LOG OUT</a></li>
+    </ul>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+    <title>Registration</title>
+    <link rel="stylesheet" href="/stylesheets/style_login_sign_Rest.css">
+</head>
+  
+<body>
+    <div class="main">
+        <h1>Create an account </h1>
+
+        <form action="/signuping" method="post"id="signupForm">
+            <label for="Username">
+                Username:
+            </label>
+            <input type="text" id="username" name="username" 
+                placeholder="Enter your Username" required>
+
+            <label for="Email">
+                Email:
+            </label>
+            <input type="Email" id="email" name="email" 
+                placeholder="Enter your email" required>
+
+            <label for="password">
+                Password:
+            </label>
+            <input type="password" id="password" name="password" 
+                placeholder="Enter your Password" required>
+
+            <label for="password_comfirm">
+                Comfirm Password:
+            </label>
+            <input type="password_comfirm" id="password_comfirm" name="password_comfirm" 
+                placeholder="Comfirm Password" required>
+
+            <div class="wrap">
+                <button type="Sign up">Sign up</button>
+            </div>
+
+        </form>
+    </div>
+</body>
+</html>
